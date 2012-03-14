@@ -16,7 +16,7 @@ EventShim is easy to implement.
     $ git clone git@github.com:jwmcpeak/EventShim
 
 #### Step 2: Load the Script
-    &lt;script src="eventShim.js"&gt;&lt;/script&gt;
+    <script src="eventShim.js"></script>
 
 #### API
 None at the moment. The goal of EventShim is to make writing cross-browser event code painless and transparent.
