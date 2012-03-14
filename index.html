@@ -1,0 +1,22 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title></title>
+        
+        
+    </head>
+    <body>
+        <a href="http://www.google.com">Google</a>
+        <script src="eventShim.js"></script>
+        <script>
+            document.addEventListener("click", function(evt) {
+                if (evt.target.tagName === "A") {
+                    alert("You clicked the A element!");
+                    evt.preventDefault();
+                }
+            }, false);
+        </script>
+    </body>
+</html>
