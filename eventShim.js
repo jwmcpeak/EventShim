@@ -79,8 +79,8 @@ var addEventListenerFunc = function(type, fn, useCapture) {
 
 
 // setup the DOM objects
-HTMLDocument.prototype.addEventListener = addEventListenerFunc
-Element.prototype.addEventListener = addEventListenerFunc
+HTMLDocument.prototype.addEventListener = addEventListenerFunc;
+Element.prototype.addEventListener = addEventListenerFunc;
 
 
 
