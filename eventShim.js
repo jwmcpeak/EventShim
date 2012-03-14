@@ -1,4 +1,4 @@
-﻿(function($){
+﻿(function(){
 
 // not the best of checks; will have something more concrete later
 if (typeof document.addEventListener !== "undefined") {
