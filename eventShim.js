@@ -6,8 +6,13 @@
 
 (function(){
 
-// IE version check by James Padolsey
-// https://gist.github.com/527683
+/**
+ * IE version check by James Padolsey
+ * https://gist.github.com/527683
+ * 
+ * Yeah, yeah. Browser sniffing is so awful, bad practice, blah blah.
+ * We need the version to check filter out all versions except 8.
+ */
 var ie = (function(){
 
     var undef,
@@ -24,64 +29,133 @@ var ie = (function(){
     
 }());
 
+// You are no IE8
 if (ie !== 8) {
+    // Goodbye
     return;
 }
 
 // create an MS event object and get prototype
 var proto = document.createEventObject().constructor.prototype;
 
-//
-// The target Property
-//
-Object.defineProperty( proto, "target", {
-    get: function(){ return this.srcElement; }
+/**
+ * Indicates whether an event propagates up from the target.
+ * @returns Boolean
+ */
+Object.defineProperty( proto, "bubbles", {
+    get: function() {
+        // not a complete list of DOM3 events; some of these IE8 doesn't support
+        var bubbleEvents = [ "select", "scroll", "click", "dblclick",
+            "mousedown", "mousemove", "mouseout", "mouseover", "mouseup", "wheel", "textinput",
+            "keydown", "keypress", "keyup"],
+            type = this.type;
+
+        for (var i = 0, l = bubbleEvents.length; i < l; i++) {
+            if (type === bubbleEvents[i]) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 });
 
-//
-// The relatedTarget Property
-//
+
+/**
+ * Indicates whether or not preventDefault() was called on the event.
+ * @returns Boolean
+ */
+Object.defineProperty( proto, "defaultPrevented", {
+    get: function() {
+        // if preventDefault() was never called, or returnValue not given a value
+        // then returnValue is undefined
+        var returnValue = this.returnValue,
+            undef;
+
+        return !(returnValue === undef || returnValue);
+    }
+});
+
+
+/**
+ * Gets the secondary targets of mouseover and mouseout events (toElement and fromElement)
+ * @returns EventTarget or {null}
+ */
 Object.defineProperty( proto, "relatedTarget", {
-    get: function(){
+    get: function() {
         var type = this.type;
 
         if (type === "mouseover" || type === "mouseout") {
             return (type === "mouseover") ? this.fromElement : this.toElement;
         }
+
+        return null;
     }
 });
 
-//
-// The preventDefault() Method
-//
+
+/**
+ * Gets the target of the event (srcElement)
+ * @returns EventTarget
+ */
+Object.defineProperty( proto, "target", {
+    get: function(){ return this.srcElement; }
+});
+
+
+/**
+ * Cancels the event if it is cancelable. (returnValue)
+ * @returns {undefined}
+ */
 proto.preventDefault = function() {
     this.returnValue = false;
 };
 
-//
-// The stopPropagation() Method
-//
+/**
+ * Prevents further propagation of the current event. (cancelBubble())
+ * @returns {undefined}
+ */
 proto.stopPropagation = function() {
     this.cancelBubble();
 };
 
 
-//
-////
-////// The addEventListener() and removeEventListener() method setup
-////
-//
+
+/***************************************
+ *
+ * Event Listener Setup
+ *    Nothing complex here
+ *
+ ***************************************/
+
+/**
+ * Adds an event listener to the DOM object
+ * @returns {undefined}
+ */
 var addEventListenerFunc = function(type, fn, useCapture) {
     // useCapture isn't used; it's IE!
 
     this.attachEvent("on" + type, fn);
 };
 
+/**
+ * Removes an event listener to the DOM object
+ * @returns {undefined}
+ */
+var removeEventListenerFunc = function(type, fn, useCapture) {
+    // useCapture isn't used; it's IE!
 
-// setup the DOM objects
+    this.detach("on" + type, fn);
+};
+
+// setup the DOM and window objects
 HTMLDocument.prototype.addEventListener = addEventListenerFunc;
+HTMLDocument.prototype.removeEventListener = removeEventListenerFunc;
+
 Element.prototype.addEventListener = addEventListenerFunc;
+Element.prototype.removeEventListener = removeEventListenerFunc;
 
-
+window.addEventListener = addEventListenerFunc;
+window.removeEventListener = removeEventListenerFunc;
 
 }());
