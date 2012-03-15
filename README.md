@@ -33,7 +33,7 @@ The goal of EventShim is to make writing cross-browser event code painless and t
 - preventDefault()
 - stopPropagation()
 
-EventShim also adds addEventListener() and removeEventListener to the following objects and/or interfaces:
+EventShim also adds addEventListener() and removeEventListener() to the following objects and/or interfaces:
 
 - window
 - HTMLDocument
