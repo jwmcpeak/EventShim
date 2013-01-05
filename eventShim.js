@@ -145,7 +145,7 @@ var addEventListenerFunc = function(type, fn, useCapture) {
 var removeEventListenerFunc = function(type, fn, useCapture) {
     // useCapture isn't used; it's IE!
 
-    this.detach("on" + type, fn);
+    this.detachEvent("on" + type, fn);
 };
 
 // setup the DOM and window objects
