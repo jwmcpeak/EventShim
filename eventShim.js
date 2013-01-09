@@ -119,6 +119,10 @@ proto.stopPropagation = function() {
     this.cancelBubble = true;
 };
 
+var implementsEventListener = function(obj) {
+    return (typeof obj !== "function" && typeof obj["handleEvent"] === "function");	
+};
+
 
 
 /***************************************
@@ -136,7 +140,7 @@ var addEventListenerFunc = function(type, fn, useCapture) {
     // useCapture isn't used; it's IE!
 	
 	// are they using the EventListener interface?
-	if (typeof fn !== "function" && typeof fn["handleEvent"] === "function") {
+	if (implementsEventListener(fn)) {
 		// if so, create a new eventHandler function that we can remove later
 		fn["__eventShim_"+type] = function(e) {
 			fn["handleEvent"](e);
@@ -155,7 +159,7 @@ var removeEventListenerFunc = function(type, fn, useCapture) {
     // useCapture isn't used; it's IE!
 
 	// are they using the EventListener interface?
-	if (typeof fn !== "function" && typeof fn["handleEvent"] === "function") {
+	if (implementsEventListener(fn)) {
 		this.detachEvent("on" + type, fn["__eventShim_"+type]);
 	} else {
 		this.detachEvent("on" + type, fn);
