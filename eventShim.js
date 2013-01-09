@@ -116,7 +116,7 @@ proto.preventDefault = function() {
  * @returns {undefined}
  */
 proto.stopPropagation = function() {
-    this.cancelBubble();
+    this.cancelBubble = true;
 };
 
 
@@ -134,8 +134,17 @@ proto.stopPropagation = function() {
  */
 var addEventListenerFunc = function(type, fn, useCapture) {
     // useCapture isn't used; it's IE!
-
-    this.attachEvent("on" + type, fn);
+	
+	// are they using the EventListener interface?
+	if (typeof fn !== "function" && typeof fn["handleEvent"] === "function") {
+		// if so, create a new eventHandler function that we can remove later
+		fn["__eventShim_"+type] = function(e) {
+			fn["handleEvent"](e);
+		};
+		this.attachEvent("on" + type, fn["__eventShim_"+type]);
+	} else {
+		this.attachEvent("on" + type, fn);
+	}
 };
 
 /**
@@ -145,7 +154,12 @@ var addEventListenerFunc = function(type, fn, useCapture) {
 var removeEventListenerFunc = function(type, fn, useCapture) {
     // useCapture isn't used; it's IE!
 
-    this.detachEvent("on" + type, fn);
+	// are they using the EventListener interface?
+	if (typeof fn !== "function" && typeof fn["handleEvent"] === "function") {
+		this.detachEvent("on" + type, fn["__eventShim_"+type]);
+	} else {
+		this.detachEvent("on" + type, fn);
+	}
 };
 
 // setup the DOM and window objects
