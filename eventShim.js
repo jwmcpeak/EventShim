@@ -127,6 +127,11 @@ proto.stopPropagation = function() {
  *    Nothing complex here
  *
  ***************************************/
+ 
+window.uniqueID = "window";
+
+var elementEventTable = {
+};
 
 /**
  * Adds an event listener to the DOM object
@@ -134,8 +139,29 @@ proto.stopPropagation = function() {
  */
 var addEventListenerFunc = function(type, fn, useCapture) {
     // useCapture isn't used; it's IE!
-
-    this.attachEvent("on" + type, fn);
+    var typeTable = elementEventTable[this.uniqueID] = elementEventTable[this.uniqueID] || {};
+    var funcArray = typeTable[type] = typeTable[type] || [];
+    funcArray.push(fn);
+    if (funcArray.length > 1) {
+        return;
+    }
+    
+    funcArray['function'] = function(e){
+        var rtn = true;
+        for (var i = 0; i < funcArray.length; i++) {
+            if (funcArray[i]['handleEvent']) {
+                if( funcArray[i].handleEvent.call(funcArray[i],e) == false) {
+                    rtn = false;
+                }
+            }
+            if (funcArray[i].call(this,e) == false) {
+                rtn = false;
+            }
+        }
+        
+    };
+    
+    this.attachEvent("on" + type, funcArray['function'] );
 };
 
 /**
@@ -144,8 +170,17 @@ var addEventListenerFunc = function(type, fn, useCapture) {
  */
 var removeEventListenerFunc = function(type, fn, useCapture) {
     // useCapture isn't used; it's IE!
-
-    this.detachEvent("on" + type, fn);
+    var typeTable = elementEventTable[this.uniqueID] = elementEventTable[this.uniqueID] || {};
+    var funcArray = typeTable[type] = typeTable[type] || [];
+    
+    for (var i = funcArray.length-1; i >= 0; i--) {
+        if (funcArray[i] === fn) {
+            funcArray.splice(i,1);
+        }
+    }
+    if (funcArray.length === 0) {
+        this.detachEvent("on" + type, funcArray['function'] );
+    }
 };
 
 // setup the DOM and window objects
