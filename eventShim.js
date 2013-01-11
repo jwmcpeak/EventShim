@@ -119,12 +119,6 @@ proto.stopPropagation = function() {
     this.cancelBubble = true;
 };
 
-var implementsEventListener = function(obj) {
-    return (typeof obj !== "function" && typeof obj["handleEvent"] === "function");	
-};
-
-
-
 /***************************************
  *
  * Event Listener Setup
@@ -133,37 +127,53 @@ var implementsEventListener = function(obj) {
  ***************************************/
 
 /**
+ * Determines if the provided object implements EventListener
+ * @returns boolean
+*/
+var implementsEventListener = function (obj) {
+    return (typeof obj !== "function" && typeof obj["handleEvent"] === "function");
+};
+
+/**
  * Adds an event listener to the DOM object
  * @returns {undefined}
  */
-var addEventListenerFunc = function(type, fn, useCapture) {
+var addEventListenerFunc = function(type, handler, useCapture) {
     // useCapture isn't used; it's IE!
+
+    var fn = handler;
 	
-	// are they using the EventListener interface?
-	if (implementsEventListener(fn)) {
-		// if so, create a new eventHandler function that we can remove later
-		fn["__eventShim_"+type] = function(e) {
-			fn["handleEvent"](e);
-		};
-		this.attachEvent("on" + type, fn["__eventShim_"+type]);
-	} else {
-		this.attachEvent("on" + type, fn);
-	}
+    if (implementsEventListener(handler)) {
+
+        var key = "__eventShim_" + type;
+
+        if (typeof handler[key] !== "function") {
+            handler[key] = handler["handleEvent"].bind(handler);
+        }
+
+        fn = handler[key];
+	} 
+
+    this.attachEvent("on" + type, fn);
 };
 
 /**
  * Removes an event listener to the DOM object
  * @returns {undefined}
  */
-var removeEventListenerFunc = function(type, fn, useCapture) {
+var removeEventListenerFunc = function (type, handler, useCapture) {
     // useCapture isn't used; it's IE!
 
-	// are they using the EventListener interface?
-	if (implementsEventListener(fn)) {
-		this.detachEvent("on" + type, fn["__eventShim_"+type]);
-	} else {
-		this.detachEvent("on" + type, fn);
-	}
+    var fn = obj;
+
+    if (implementsEventListener(handler)) {
+
+        var key = "__eventShim_" + type;
+
+        fn = handler[key];
+	} 
+
+    this.detachEvent("on" + type, fn);
 };
 
 // setup the DOM and window objects
