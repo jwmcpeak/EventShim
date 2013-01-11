@@ -134,6 +134,8 @@ var implementsEventListener = function (obj) {
     return (typeof obj !== "function" && typeof obj["handleEvent"] === "function");
 };
 
+var customELKey = "__eventShim__";
+
 /**
  * Adds an event listener to the DOM object
  * @returns {undefined}
@@ -145,13 +147,13 @@ var addEventListenerFunc = function(type, handler, useCapture) {
 	
     if (implementsEventListener(handler)) {
 
-        var key = "__eventShim_" + type;
-
-        if (typeof handler[key] !== "function") {
-            handler[key] = handler["handleEvent"].bind(handler);
+        if (typeof handler[customELKey] !== "function") {
+            handler[customELKey] = function (e) {
+                handler["handleEvent"](e);
+            };
         }
 
-        fn = handler[key];
+        fn = handler[customELKey];
 	} 
 
     this.attachEvent("on" + type, fn);
@@ -167,10 +169,7 @@ var removeEventListenerFunc = function (type, handler, useCapture) {
     var fn = obj;
 
     if (implementsEventListener(handler)) {
-
-        var key = "__eventShim_" + type;
-
-        fn = handler[key];
+        fn = handler[customELKey];
 	} 
 
     this.detachEvent("on" + type, fn);
