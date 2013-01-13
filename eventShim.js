@@ -154,7 +154,7 @@ var addEventListenerFunc = function(type, handler, useCapture) {
         }
 
         fn = handler[customELKey];
-	} 
+    } 
 
     this.attachEvent("on" + type, fn);
 };
@@ -166,11 +166,11 @@ var addEventListenerFunc = function(type, handler, useCapture) {
 var removeEventListenerFunc = function (type, handler, useCapture) {
     // useCapture isn't used; it's IE!
 
-    var fn = obj;
+    var fn = handler;
 
     if (implementsEventListener(handler)) {
         fn = handler[customELKey];
-	} 
+    } 
 
     this.detachEvent("on" + type, fn);
 };
