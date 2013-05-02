@@ -1,7 +1,7 @@
 # EventShim
 
 ## A Basic Standards DOM Event API for IE8
-EventShim is a shim that adds support for addEventListener(), removeEventListener(), and standard Event object properties to IE8's event model.
+EventShim adds support for addEventListener(), removeEventListener(), and standard Event object properties to IE8's event model.
 
 ### Why
 To write standards-based event code now in IE8 without using a library such as jQuery, MooTools, etc.
