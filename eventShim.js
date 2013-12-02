@@ -22,7 +22,8 @@
                 all = div.getElementsByTagName('i');
 
             while (div.innerHTML = '<!--[if gt IE ' + (++v) + ']><i></i><![endif]-->',
-            all[0]) ;
+            
+            all[0]);
 
             return v > 4 ? v : undef;
 
@@ -31,7 +32,10 @@
         // You are no IE8
         if (ie !== 8) {
             // Goodbye
-            return;
+            return {
+                ie : ie ? ie : -1,
+                loadedForBrowser : false
+            };
         }
 
         // create an MS event object and get prototype
@@ -183,13 +187,18 @@
 
         window.addEventListener = addEventListenerFunc;
         window.removeEventListener = removeEventListenerFunc;
+
+        return {
+            ie : ie,
+            loadedForBrowser : true
+        };
     }
 
     // check for AMD support
     if (typeof define === "function" && define["amd"]) {
         define(init);
     } else {
-        init();
+        return init();
     }
     
 }());
