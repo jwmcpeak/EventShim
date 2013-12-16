@@ -8,7 +8,7 @@
 
     function init() {
 
-        // filter out browsers unsupported browsers
+        // filter out unsupported browsers
         if (Element.prototype.addEventListener || !Object.defineProperty) {
             return {
                 loadedForBrowser : false
