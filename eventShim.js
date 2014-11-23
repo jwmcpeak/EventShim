@@ -136,7 +136,7 @@
                 fn = handler[customELKey];
             }
 
-            this.attachEvent("on" + type, fn);
+            this.attachEvent("on" + type, fn.bind(this));
         };
 
         /**
@@ -152,7 +152,7 @@
                 fn = handler[customELKey];
             }
 
-            this.detachEvent("on" + type, fn);
+            this.detachEvent("on" + type, fn.bind(this));
         };
 
         // setup the DOM and window objects
@@ -176,5 +176,5 @@
     } else {
         return init();
     }
-    
+
 }());
